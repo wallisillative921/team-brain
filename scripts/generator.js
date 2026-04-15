@@ -19,7 +19,11 @@ function generateBrain(projectRoot) {
   lines.push('');
 
   for (const type of priorityOrder) {
-    const entries = store.listEntries(projectRoot, type).filter(e => e.meta.status !== 'deprecated');
+    const typeEntries = store.listEntries(projectRoot, type).filter(e => e.meta.status !== 'deprecated');
+    // Sort expired entries to the end
+    const active = typeEntries.filter(e => !store.isExpired(e.meta));
+    const expired = typeEntries.filter(e => store.isExpired(e.meta));
+    const entries = [...active, ...expired];
     if (entries.length === 0) continue;
 
     // Check if we have room
@@ -38,16 +42,17 @@ function generateBrain(projectRoot) {
       const title = entry.meta.title || entry.filename;
       const author = config.include_authors ? ` (${entry.meta.author || 'unknown'})` : '';
       const date = config.include_dates ? ` [${entry.meta.date || ''}]` : '';
+      const stale = store.isExpired(entry.meta) ? ' ⚠ STALE' : '';
 
       if (type === 'conventions') {
         // Conventions get the full first paragraph
         const firstPara = entry.body.trim().split('\n\n')[0].replace(/^#+\s.*\n?/, '').trim();
-        lines.push(`- **${title}**: ${firstPara}`);
+        lines.push(`- **${title}**: ${firstPara}${stale}`);
       } else if (type === 'decisions') {
         const status = entry.meta.status || 'accepted';
-        lines.push(`- **${title}** (${status})${date}${author}`);
+        lines.push(`- **${title}** (${status})${date}${author}${stale}`);
       } else {
-        lines.push(`- ${title}${date}${author}`);
+        lines.push(`- ${title}${date}${author}${stale}`);
       }
     }
 

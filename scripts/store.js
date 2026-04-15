@@ -63,6 +63,19 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function isExpired(meta) {
+  const now = new Date(today());
+  if (meta.expires) {
+    return new Date(meta.expires) <= now;
+  }
+  if (meta.ttl_days && meta.date) {
+    const created = new Date(meta.date);
+    created.setDate(created.getDate() + parseInt(meta.ttl_days, 10));
+    return created <= now;
+  }
+  return false;
+}
+
 // --- Project Root ---
 
 function findProjectRoot(startDir) {
@@ -238,7 +251,7 @@ function saveConfig(projectRoot, config) {
 }
 
 module.exports = {
-  slugify, parseFrontmatter, buildFrontmatter, getAuthor, today,
+  slugify, parseFrontmatter, buildFrontmatter, getAuthor, today, isExpired,
   findProjectRoot, brainDir, init,
   addEntry, listEntries, readEntry, getNextDecisionNumber,
   getContributors, addContributor, loadConfig, saveConfig,
